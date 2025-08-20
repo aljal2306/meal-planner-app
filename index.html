@@ -68,7 +68,10 @@
         </section>
         
         <div id="recipe-details" style="display:none;">
-            <h3 id="recipe-details-name"></h3>
+            <div id="recipe-name-edit-container">
+                <input type="text" id="recipe-details-name" />
+                <button id="save-name-btn">Save Name</button>
+            </div>
             <img id="recipe-details-image" src="#" alt="Recipe Image">
             <label for="update-recipe-image">Update Picture:</label>
             <input type="file" id="update-recipe-image" accept="image/*">
