@@ -13,7 +13,7 @@ header {
 
 main {
     max-width: 1200px;
-    margin: 0 auto; /* Centered horizontally */
+    margin: 0 auto;
     background: white;
     padding: 20px;
     border-radius: 8px;
@@ -57,18 +57,18 @@ select.meal-selector, #recipe-category, #recipe-details-category, #view-category
     background-color: #1a73e8;
     color: white;
     border: none;
-    padding: 10px 15px; /* Added horizontal padding for consistent sizing */
+    padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     margin-top: 10px;
 }
 
-.export-day-btn {
+.export-day-btn, #save-name-btn {
     background-color: #1a73e8;
     color: white;
     border: none;
-    padding: 8px 12px; /* Slightly smaller button for better fit */
+    padding: 8px 12px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
@@ -166,6 +166,26 @@ select.meal-selector, #recipe-category, #recipe-details-category, #view-category
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
+}
+
+#recipe-details-name {
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    background: transparent;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#recipe-name-edit-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#save-name-btn {
+    flex-shrink: 0;
 }
 
 #recipe-details-image {
