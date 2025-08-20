@@ -1,0 +1,241 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto; /* Centered horizontally */
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+h1, h2, h3 {
+    color: #1a73e8;
+}
+
+#recipe-form label, #recipe-form input, #recipe-form textarea, #recipe-form button {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+input, textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+select.meal-selector, #recipe-category, #recipe-details-category, #view-category-select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#add-ingredient-btn, button[type="submit"], #generate-list-btn, #finalize-list-btn, #save-recipe-image-btn, #close-details-btn, #save-prep-steps-btn, #generate-cookbook-btn, #add-detail-ingredient-btn, #save-ingredients-btn, #save-category-btn, .delete-recipe-btn {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 10px 15px; /* Added horizontal padding for consistent sizing */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.export-day-btn {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 8px 12px; /* Slightly smaller button for better fit */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+#delete-recipe-image-btn {
+    background-color: #dc3545;
+}
+
+.delete-recipe-btn {
+    background-color: #dc3545;
+    font-size: 12px;
+    padding: 5px 8px;
+    margin-left: auto;
+}
+
+.ingredient-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ingredient-input input {
+    flex-grow: 1;
+}
+
+.meal-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    text-align: center;
+}
+
+.day {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+}
+
+#grocery-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#grocery-list li {
+    background-color: #e8f0fe;
+    padding: 10px;
+    border-left: 5px solid #1a73e8;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+#grocery-list li label {
+    display: block;
+    cursor: pointer;
+}
+
+#saved-recipes-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+#saved-recipes-list li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+#shopping-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#saved-recipes-list li.recipe-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#saved-recipes-list li.recipe-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+#saved-recipes-list li.recipe-item:hover {
+    background-color: #f0f0f0;
+}
+
+#recipe-details {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+#recipe-details-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.ingredient-input-details {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ingredient-input-details input {
+    flex-grow: 1;
+}
+
+/* New styles for printable cookbook */
+.cookbook-recipe {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.cookbook-recipe h3 {
+    margin-top: 0;
+    border-bottom: 2px solid #1a73e8;
+    padding-bottom: 5px;
+}
+
+.cookbook-recipe img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.cookbook-recipe ul, .cookbook-recipe p {
+    margin-top: 0;
+}
+
+.cookbook-recipe ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+/* Responsive styles for small screens */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Print-specific styles to hide buttons and change layout */
+@media print {
+    body {
+        background-color: white;
+        padding: 0;
+        margin: 0;
+    }
+    
+    header, main, section {
+        box-shadow: none;
+        padding: 0;
+    }
+
+    #generate-list-btn, #generate-cookbook-btn, #recipe-manager, #meal-planner, #grocery-list-section, hr {
+        display: none;
+    }
+}
