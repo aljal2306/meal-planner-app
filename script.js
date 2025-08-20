@@ -1,3 +1,8 @@
+// --- Supabase Setup ---
+const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co'; // Replace with your Project URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs'; // Replace with your anon key
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // Get DOM elements
 const recipeForm = document.getElementById('recipe-form');
 const addIngredientBtn = document.getElementById('add-ingredient-btn');
@@ -33,19 +38,72 @@ const exportDayBtns = document.querySelectorAll('.export-day-btn');
 // Variable to store the name of the currently viewed recipe
 let currentRecipeName = null;
 
-// Initialize data from localStorage or as empty arrays/objects
-let recipes;
-try {
-    recipes = JSON.parse(localStorage.getItem('recipes')) || [];
-} catch (e) {
-    console.error("Failed to parse recipes from localStorage. Starting with a fresh list.");
-    recipes = [];
-}
+// Initialize data from Supabase and localStorage
+let recipes = [];
 let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {};
+
+// --- Data Fetching and Saving Functions ---
+
+async function fetchRecipes() {
+    let { data, error } = await supabase
+        .from('recipes')
+        .select('*');
+    if (error) {
+        console.error('Error fetching recipes:', error);
+        return;
+    }
+    recipes = data;
+    renderRecipes();
+}
+
+async function saveRecipeToDb(recipe) {
+    const { error } = await supabase
+        .from('recipes')
+        .insert([recipe]);
+    if (error) {
+        console.error('Error saving recipe:', error);
+        alert('There was an error saving your recipe. Please try again.');
+        return;
+    }
+    await fetchRecipes();
+    recipeForm.reset();
+    recipeImageInput.value = '';
+}
+
+async function updateRecipeInDb(recipeName, updateObject) {
+    const { error } = await supabase
+        .from('recipes')
+        .update(updateObject)
+        .eq('name', recipeName);
+    if (error) {
+        console.error('Error updating recipe:', error);
+        alert('There was an error updating your recipe. Please try again.');
+        return;
+    }
+    await fetchRecipes();
+}
+
+async function deleteRecipeFromDb(recipeName) {
+    const { error } = await supabase
+        .from('recipes')
+        .delete()
+        .eq('name', recipeName);
+    if (error) {
+        console.error('Error deleting recipe:', error);
+        alert('There was an error deleting the recipe. Please try again.');
+        return;
+    }
+    for (const day in mealPlan) {
+        if (mealPlan[day] === recipeName) {
+            mealPlan[day] = '';
+        }
+    }
+    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+    await fetchRecipes();
+}
 
 // --- Recipe Management Functions ---
 
-// Adds a new ingredient input field to the form
 addIngredientBtn.addEventListener('click', () => {
     const ingredientInputDiv = document.createElement('div');
     ingredientInputDiv.className = 'ingredient-input';
@@ -57,7 +115,6 @@ addIngredientBtn.addEventListener('click', () => {
     ingredientsList.appendChild(ingredientInputDiv);
 });
 
-// Handles saving a new recipe
 recipeForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -86,20 +143,14 @@ recipeForm.addEventListener('submit', (e) => {
     };
 
     const saveRecipe = () => {
-        recipes.push(newRecipe);
-        localStorage.setItem('recipes', JSON.stringify(recipes));
-        renderRecipes();
-        recipeForm.reset();
-        // Explicitly reset the file input value
-        recipeImageInput.value = '';
+        saveRecipeToDb(newRecipe);
     };
 
     if (file) {
-        // Limit file size to roughly 4MB (4 * 1024 * 1024 bytes) to avoid localStorage limits
         const fileSizeLimit = 4 * 1024 * 1024;
         if (file.size > fileSizeLimit) {
             alert("Error: The image file is too large. Please select a smaller image (under 4MB).");
-            recipeImageInput.value = ''; // Clear the file input
+            recipeImageInput.value = '';
             return;
         }
 
@@ -114,21 +165,17 @@ recipeForm.addEventListener('submit', (e) => {
     }
 });
 
-// Displays saved recipes based on selected category and updates the dropdown menus
 function renderRecipes() {
-    savedRecipesList.innerHTML = ''; // Clear the list
+    savedRecipesList.innerHTML = '';
     mealSelectors.forEach(selector => {
         selector.innerHTML = '<option value="">Select a recipe...</option>';
     });
-    
+
     const selectedCategory = viewCategorySelect.value;
     const recipesToDisplay = selectedCategory === 'All' ? recipes : recipes.filter(r => r.category === selectedCategory);
 
     recipesToDisplay.forEach(recipe => {
-        // Add to the saved recipes list and make it clickable
         const li = document.createElement('li');
-        
-        // Create a checkbox and a label for the list item
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'cookbook-select-checkbox';
@@ -146,11 +193,9 @@ function renderRecipes() {
         li.appendChild(checkbox);
         li.appendChild(label);
         li.appendChild(deleteBtn);
-        
-        li.classList.add('recipe-item'); // Add a class to style and identify it
+        li.classList.add('recipe-item');
         savedRecipesList.appendChild(li);
 
-        // Add to each meal selector dropdown
         const option = document.createElement('option');
         option.value = recipe.name;
         option.textContent = recipe.name;
@@ -160,7 +205,6 @@ function renderRecipes() {
         });
     });
 
-    // Re-select previously saved recipes in the meal plan
     mealSelectors.forEach(selector => {
         const day = selector.closest('.day').dataset.day;
         if (mealPlan[day]) {
@@ -169,44 +213,23 @@ function renderRecipes() {
     });
 }
 
-// Event listener for the new category dropdown to filter recipes
 viewCategorySelect.addEventListener('change', renderRecipes);
 
-// Event listener for deleting a recipe
 savedRecipesList.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-recipe-btn')) {
         const recipeNameToDelete = e.target.dataset.recipeName;
-        
-        // Filter out the recipe to be deleted
-        recipes = recipes.filter(r => r.name !== recipeNameToDelete);
-        localStorage.setItem('recipes', JSON.stringify(recipes));
-        
-        // Also remove the recipe from the meal plan if it was selected
-        for (const day in mealPlan) {
-            if (mealPlan[day] === recipeNameToDelete) {
-                mealPlan[day] = '';
-            }
-        }
-        localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
-        
-        renderRecipes(); // Re-render the list
+        deleteRecipeFromDb(recipeNameToDelete);
+        return;
     }
-});
 
-// Add event listener to the saved recipes list to show details on click
-savedRecipesList.addEventListener('click', (e) => {
-    // Check if the clicked item is the text label (not the checkbox or button)
     if (e.target.classList.contains('recipe-item-label')) {
         const recipeName = e.target.textContent;
         const selectedRecipe = recipes.find(r => r.name === recipeName);
 
         if (selectedRecipe) {
-            // Store the current recipe name
             currentRecipeName = selectedRecipe.name;
-            // Clear any previous edit messages
             editMessage.style.display = 'none';
 
-            // Populate the details section
             recipeDetailsName.textContent = selectedRecipe.name;
             recipeDetailsStepsTextarea.value = selectedRecipe.steps;
             recipeDetailsCategorySelect.value = selectedRecipe.category;
@@ -220,28 +243,19 @@ savedRecipesList.addEventListener('click', (e) => {
                 deleteRecipeImageBtn.style.display = 'none';
             }
 
-            // Render editable ingredient inputs
             renderEditableIngredients(selectedRecipe.ingredients);
-
-            // Show the details section and hide other sections
-            recipeDetails.style.display = 'block';
+            
             document.getElementById('recipe-manager').style.display = 'none';
             document.getElementById('meal-planner').style.display = 'none';
             document.getElementById('grocery-list-section').style.display = 'none';
+            document.getElementById('recipe-details').style.display = 'block';
         }
     }
 });
 
-// Event listener for deleting a picture
 deleteRecipeImageBtn.addEventListener('click', () => {
     if (currentRecipeName) {
-        recipes = recipes.map(recipe => {
-            if (recipe.name === currentRecipeName) {
-                return { ...recipe, image: null };
-            }
-            return recipe;
-        });
-        localStorage.setItem('recipes', JSON.stringify(recipes));
+        updateRecipeInDb(currentRecipeName, { image: null });
         recipeDetailsImage.style.display = 'none';
         deleteRecipeImageBtn.style.display = 'none';
         editMessage.textContent = 'Picture deleted successfully!';
@@ -249,7 +263,6 @@ deleteRecipeImageBtn.addEventListener('click', () => {
     }
 });
 
-// Function to render editable ingredients
 function renderEditableIngredients(ingredients) {
     recipeDetailsIngredientsEdit.innerHTML = '';
     ingredients.forEach(ingredient => {
@@ -265,7 +278,6 @@ function renderEditableIngredients(ingredients) {
     });
 }
 
-// Add event listener for adding new ingredient to details view
 addDetailIngredientBtn.addEventListener('click', () => {
     const ingredientInputDiv = document.createElement('div');
     ingredientInputDiv.className = 'ingredient-input-details';
@@ -278,14 +290,12 @@ addDetailIngredientBtn.addEventListener('click', () => {
     recipeDetailsIngredientsEdit.appendChild(ingredientInputDiv);
 });
 
-// Add event listener for removing ingredients from details view
 recipeDetailsIngredientsEdit.addEventListener('click', (e) => {
     if (e.target.classList.contains('remove-ingredient-btn')) {
         e.target.closest('.ingredient-input-details').remove();
     }
 });
 
-// Add event listener for saving the updated recipe ingredients
 saveIngredientsBtn.addEventListener('click', () => {
     if (currentRecipeName) {
         const ingredientInputs = recipeDetailsIngredientsEdit.querySelectorAll('.ingredient-input-details');
@@ -298,32 +308,21 @@ saveIngredientsBtn.addEventListener('click', () => {
                 updatedIngredients.push({ name, quantity, unit });
             }
         });
-        
-        recipes = recipes.map(recipe => {
-            if (recipe.name === currentRecipeName) {
-                return { ...recipe, ingredients: updatedIngredients };
-            }
-            return recipe;
-        });
-        localStorage.setItem('recipes', JSON.stringify(recipes));
+        updateRecipeInDb(currentRecipeName, { ingredients: updatedIngredients });
         editMessage.textContent = 'Ingredients saved successfully!';
         editMessage.style.display = 'block';
     }
 });
 
-// Add event listener for the "Close" button
 closeDetailsBtn.addEventListener('click', () => {
-    // Reset current recipe name
     currentRecipeName = null;
-    // Hide the details section and show the others
-    recipeDetails.style.display = 'none';
+    document.getElementById('recipe-details').style.display = 'none';
     document.getElementById('recipe-manager').style.display = 'block';
     document.getElementById('meal-planner').style.display = 'block';
     document.getElementById('grocery-list-section').style.display = 'block';
 });
 
-// Add event listener for saving the updated recipe image
-saveRecipeImageBtn.addEventListener('click', () => {
+saveRecipeImageBtn.addEventListener('click', async () => {
     if (currentRecipeName) {
         const file = updateRecipeImageInput.files[0];
         if (!file) {
@@ -343,13 +342,7 @@ saveRecipeImageBtn.addEventListener('click', () => {
         const reader = new FileReader();
         reader.onloadend = () => {
             const imageData = reader.result;
-            recipes = recipes.map(recipe => {
-                if (recipe.name === currentRecipeName) {
-                    return { ...recipe, image: imageData };
-                }
-                return recipe;
-            });
-            localStorage.setItem('recipes', JSON.stringify(recipes));
+            updateRecipeInDb(currentRecipeName, { image: imageData });
             recipeDetailsImage.src = imageData;
             recipeDetailsImage.style.display = 'block';
             deleteRecipeImageBtn.style.display = 'block';
@@ -361,35 +354,19 @@ saveRecipeImageBtn.addEventListener('click', () => {
     }
 });
 
-// Add event listener for saving the updated prep steps
 savePrepStepsBtn.addEventListener('click', () => {
     if (currentRecipeName) {
         const updatedSteps = recipeDetailsStepsTextarea.value;
-        recipes = recipes.map(recipe => {
-            if (recipe.name === currentRecipeName) {
-                return { ...recipe, steps: updatedSteps };
-            }
-            return recipe;
-        });
-        localStorage.setItem('recipes', JSON.stringify(recipes));
-        // Show success message
+        updateRecipeInDb(currentRecipeName, { steps: updatedSteps });
         editMessage.textContent = 'Preparation steps saved successfully!';
         editMessage.style.display = 'block';
     }
 });
 
-// Add event listener for saving the updated category
 saveCategoryBtn.addEventListener('click', () => {
     if (currentRecipeName) {
         const updatedCategory = recipeDetailsCategorySelect.value;
-        recipes = recipes.map(recipe => {
-            if (recipe.name === currentRecipeName) {
-                return { ...recipe, category: updatedCategory };
-            }
-            return recipe;
-        });
-        localStorage.setItem('recipes', JSON.stringify(recipes));
-        renderRecipes(); // Re-render the list
+        updateRecipeInDb(currentRecipeName, { category: updatedCategory });
         editMessage.textContent = 'Category saved successfully!';
         editMessage.style.display = 'block';
     }
@@ -397,14 +374,12 @@ saveCategoryBtn.addEventListener('click', () => {
 
 // --- Meal Planner Functions ---
 
-// Handles changes to the meal selector dropdowns
 mealSelectors.forEach(selector => {
     selector.addEventListener('change', (e) => {
         const day = e.target.closest('.day').dataset.day;
         mealPlan[day] = e.target.value;
         localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
         
-        // Show or hide export button based on selection
         const exportBtn = e.target.closest('.day').querySelector('.export-day-btn');
         if (e.target.value) {
             exportBtn.style.display = 'block';
@@ -414,18 +389,16 @@ mealSelectors.forEach(selector => {
     });
 });
 
-// Event delegation for export day buttons
 document.getElementById('meal-planner').addEventListener('click', (e) => {
     if (e.target.classList.contains('export-day-btn')) {
         const dayContainer = e.target.closest('.day');
         const day = dayContainer.dataset.day;
         const recipeName = mealPlan[day];
-
+        
         if (!recipeName) {
             alert("No recipe selected for this day.");
             return;
         }
-
         const recipe = recipes.find(r => r.name === recipeName);
         if (recipe) {
             const now = new Date();
@@ -443,7 +416,6 @@ document.getElementById('meal-planner').addEventListener('click', (e) => {
             } else if (mealCategory === 'lunch') {
                 startHour = 12;
             }
-
             const eventStart = new Date(eventDate);
             eventStart.setHours(startHour, 0, 0);
             
@@ -451,7 +423,6 @@ document.getElementById('meal-planner').addEventListener('click', (e) => {
             eventEnd.setMinutes(eventStart.getMinutes() + duration);
             
             const format = (date) => date.toISOString().replace(/[-:]|\.\d{3}/g, '');
-            
             const ingredientsList = recipe.ingredients.map(ing => `- ${ing.quantity} ${ing.unit} ${ing.name}`).join('\n');
             const description = `Ingredients:\n${ingredientsList}\n\nPreparation Steps:\n${recipe.steps}`;
             
@@ -467,10 +438,8 @@ document.getElementById('meal-planner').addEventListener('click', (e) => {
 
 // --- Grocery List Functions ---
 
-// Handles generating the grocery list
 generateListBtn.addEventListener('click', () => {
     const consolidatedList = {};
-
     for (const day in mealPlan) {
         const recipeName = mealPlan[day];
         if (recipeName) {
@@ -485,13 +454,11 @@ generateListBtn.addEventListener('click', () => {
                             unit: ingredient.unit
                         };
                     }
-                    // Handle quantity aggregation
                     const currentQuantity = parseFloat(consolidatedList[key].quantity);
                     const newQuantity = parseFloat(ingredient.quantity);
                     if (!isNaN(currentQuantity) && !isNaN(newQuantity)) {
                         consolidatedList[key].quantity = currentQuantity + newQuantity;
                     } else if (ingredient.quantity) {
-                        // If quantity is not a number, just add it to the list
                         consolidatedList[key].quantity = consolidatedList[key].quantity ? 
                                 `${consolidatedList[key].quantity}, ${ingredient.quantity}` : 
                                 ingredient.quantity;
@@ -500,50 +467,34 @@ generateListBtn.addEventListener('click', () => {
             }
         }
     }
-
     renderGroceryList(consolidatedList);
 });
 
-// Displays the initial grocery list with checkboxes
 function renderGroceryList(list) {
     groceryListElem.innerHTML = '';
-    shoppingListElem.innerHTML = ''; // Clear the previous shopping list
-
-    // Show the controls
+    shoppingListElem.innerHTML = '';
     groceryListControls.style.display = 'block';
-
     for (const key in list) {
         const item = list[key];
         const li = document.createElement('li');
         const quantityText = item.quantity ? `${item.quantity} ${item.unit}`.trim() : '';
-        
-        li.innerHTML = `
-            <label>
-                <input type="checkbox" class="grocery-item-checkbox" data-item-name="${item.name}">
-                ${quantityText} ${item.name}
-            </label>
-        `;
+        li.innerHTML = `<label><input type="checkbox" class="grocery-item-checkbox" data-item-name="${item.name}">${quantityText} ${item.name}</label>`;
         groceryListElem.appendChild(li);
     }
 }
 
-// Handles generating the final shopping list
 finalizeListBtn.addEventListener('click', () => {
     const checkboxes = groceryListElem.querySelectorAll('.grocery-item-checkbox');
     const shoppingList = [];
-
     checkboxes.forEach(checkbox => {
-        // Collect the items that ARE checked
         if (checkbox.checked) {
             const listItem = checkbox.closest('li');
             shoppingList.push(listItem.textContent.trim());
         }
     });
-
     renderShoppingList(shoppingList);
 });
 
-// Displays the final filtered shopping list
 function renderShoppingList(list) {
     shoppingListElem.innerHTML = '';
     if (list.length === 0) {
@@ -563,44 +514,14 @@ function renderShoppingList(list) {
 generateCookbookBtn.addEventListener('click', () => {
     const selectedCheckboxes = document.querySelectorAll('.cookbook-select-checkbox:checked');
     const selectedRecipeNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.recipeName);
-
     const cookbookRecipes = recipes.filter(r => selectedRecipeNames.includes(r.name));
-
     if (cookbookRecipes.length > 0) {
-        let cookbookHTML = `
-            <html>
-            <head>
-                <title>My Printable Cookbook</title>
-                <link rel="stylesheet" href="style.css">
-            </head>
-            <body>
-                <header>
-                    <h1>My Custom Cookbook</h1>
-                </header>
-                <main>
-        `;
-        
+        let cookbookHTML = `<html><head><title>My Printable Cookbook</title><link rel="stylesheet" href="style.css"></head><body><header><h1>My Custom Cookbook</h1></header><main>`;
         cookbookRecipes.forEach(recipe => {
             const ingredientsList = recipe.ingredients.map(ing => `<li>${ing.quantity} ${ing.unit} ${ing.name}</li>`).join('');
-            
-            cookbookHTML += `
-                <div class="cookbook-recipe">
-                    <h3>${recipe.name}</h3>
-                    ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name} image">` : ''}
-                    <h4>Ingredients</h4>
-                    <ul>${ingredientsList}</ul>
-                    <h4>Preparation Steps</h4>
-                    <p>${recipe.steps}</p>
-                </div>
-            `;
+            cookbookHTML += `<div class="cookbook-recipe"><h3>${recipe.name}</h3>${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name} image">` : ''}<h4>Ingredients</h4><ul>${ingredientsList}</ul><h4>Preparation Steps</h4><p>${recipe.steps}</p></div>`;
         });
-        
-        cookbookHTML += `
-                </main>
-            </body>
-            </html>
-        `;
-
+        cookbookHTML += `</main></body></html>`;
         const newWindow = window.open('', '_blank');
         newWindow.document.write(cookbookHTML);
         newWindow.document.close();
@@ -611,4 +532,4 @@ generateCookbookBtn.addEventListener('click', () => {
 });
 
 // Initial render when the page loads
-renderRecipes();
+fetchRecipes();
