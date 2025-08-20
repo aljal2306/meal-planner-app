@@ -1,6 +1,6 @@
 // --- Supabase Setup ---
-const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co'; // Replace with your Project URL
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs'; // Replace with your anon key
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL'; // Replace with your Project URL
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your anon key
 const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Get DOM elements
@@ -16,6 +16,7 @@ const groceryListElem = document.getElementById('grocery-list');
 const shoppingListElem = document.getElementById('shopping-list');
 const recipeDetails = document.getElementById('recipe-details');
 const recipeDetailsName = document.getElementById('recipe-details-name');
+const saveNameBtn = document.getElementById('save-name-btn'); // New button
 const recipeDetailsIngredientsEdit = document.getElementById('recipe-details-ingredients-edit');
 const addDetailIngredientBtn = document.getElementById('add-detail-ingredient-btn');
 const saveIngredientsBtn = document.getElementById('save-ingredients-btn');
@@ -70,11 +71,11 @@ async function saveRecipeToDb(recipe) {
     recipeImageInput.value = '';
 }
 
-async function updateRecipeInDb(recipeName, updateObject) {
+async function updateRecipeInDb(oldName, updateObject) {
     const { error } = await supabase
         .from('recipes')
         .update(updateObject)
-        .eq('name', recipeName);
+        .eq('name', oldName);
     if (error) {
         console.error('Error updating recipe:', error);
         alert('There was an error updating your recipe. Please try again.');
@@ -230,7 +231,7 @@ savedRecipesList.addEventListener('click', (e) => {
             currentRecipeName = selectedRecipe.name;
             editMessage.style.display = 'none';
 
-            recipeDetailsName.textContent = selectedRecipe.name;
+            recipeDetailsName.value = selectedRecipe.name;
             recipeDetailsStepsTextarea.value = selectedRecipe.steps;
             recipeDetailsCategorySelect.value = selectedRecipe.category;
 
@@ -250,6 +251,42 @@ savedRecipesList.addEventListener('click', (e) => {
             document.getElementById('grocery-list-section').style.display = 'none';
             document.getElementById('recipe-details').style.display = 'block';
         }
+    }
+});
+
+saveNameBtn.addEventListener('click', async () => {
+    if (currentRecipeName) {
+        const newRecipeName = recipeDetailsName.value;
+        if (newRecipeName === currentRecipeName) {
+            editMessage.textContent = 'Name is unchanged.';
+            editMessage.style.display = 'block';
+            return;
+        }
+
+        const { error } = await supabase
+            .from('recipes')
+            .update({ name: newRecipeName })
+            .eq('name', currentRecipeName);
+        
+        if (error) {
+            console.error('Error updating recipe name:', error);
+            alert('There was an error updating the recipe name. Please try again.');
+            return;
+        }
+
+        // Update the current name and local meal plan if needed
+        const oldName = currentRecipeName;
+        currentRecipeName = newRecipeName;
+        for (const day in mealPlan) {
+            if (mealPlan[day] === oldName) {
+                mealPlan[day] = newRecipeName;
+            }
+        }
+        localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+        await fetchRecipes();
+
+        editMessage.textContent = 'Name saved successfully!';
+        editMessage.style.display = 'block';
     }
 });
 
