@@ -1,6 +1,6 @@
 // --- Supabase Setup ---
-const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co'; // Replace with your Project URL
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTY1NjQ5NiwiZXhwIjoyMDcxMjMyNDk2fQ.o-kkjvjU5edLwfTRsnVH1ID0sv9jAiYvmZRH_K8qYy8'; // Replace with your anon key
+const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTY1NjQ5NiwiZXhwIjoyMDcxMjMyNDk2fQ.o-kkjvjU5edLwfTRsnVH1ID0sv9jAiYvmZRH_K8qYy8';
 const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Get DOM elements
 const recipeForm = document.getElementById('recipe-form');
