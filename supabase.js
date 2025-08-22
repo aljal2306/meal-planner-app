@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Planner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>My Meal Planner</h1>
+    </header>
+
+    <main>
+        <section id="recipe-manager">
+            <h2>Add New Recipe</h2>
+            <form id="recipe-form">
+                <label for="recipe-name">Recipe Name:</label>
+                <input type="text" id="recipe-name" required>
+
+                <label for="recipe-category">Category:</label>
+                <select id="recipe-category" required>
+                    <option value="">Select a category...</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Soups & Salads">Soups & Salads</option>
+                    <option value="Appetizers">Appetizers</option>
+                    <option value="Side Dishes">Side Dishes</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Desserts">Desserts</option>
+                </select>
+
+                <div id="ingredients-list">
+                    <label>Ingredients:</label>
+                    <div class="ingredient-input">
+                        <input type="text" class="ingredient-name" placeholder="Name (e.g., Chicken)">
+                        <input type="text" class="ingredient-quantity" placeholder="Quantity (e.g., 2)">
+                        <input type="text" class="ingredient-unit" placeholder="Unit (e.g., lbs)">
+                    </div>
+                </div>
+                <button type="button" id="add-ingredient-btn">Add Another Ingredient</button>
+
+                <label for="prep-steps">Preparation Steps:</label>
+                <textarea id="prep-steps" rows="4"></textarea>
+
+                <label for="recipe-image">Add a picture:</label>
+                <input type="file" id="recipe-image" accept="image/*">
+
+                <button type="submit">Save Recipe</button>
+            </form>
+
+            <h3 style="margin-top: 40px;">View Saved Recipes</h3>
+            <label for="view-category-select">Select Category to View:</label>
+            <select id="view-category-select">
+                <option value="All">All Recipes</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Soups & Salads">Soups & Salads</option>
+                <option value="Appetizers">Appetizers</option>
+                <option value="Side Dishes">Side Dishes</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Desserts">Desserts</option>
+            </select>
+            <ul id="saved-recipes-list">
+                </ul>
+            <button id="generate-cookbook-btn">Generate Printable Cookbook</button>
+        </section>
+        
+        <div id="recipe-details" style="display:none;">
+            <div id="recipe-name-edit-container">
+                <input type="text" id="recipe-details-name" />
+                <button id="save-name-btn">Save Name</button>
+            </div>
+            <img id="recipe-details-image" src="#" alt="Recipe Image">
+            <label for="update-recipe-image">Update Picture:</label>
+            <input type="file" id="update-recipe-image" accept="image/*">
+            <button id="save-recipe-image-btn">Save New Picture</button>
+            <button id="delete-recipe-image-btn" style="display:none;">Delete Picture</button>
+            
+            <h4>Category</h4>
+            <select id="recipe-details-category">
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Soups & Salads">Soups & Salads</option>
+                <option value="Appetizers">Appetizers</option>
+                <option value="Side Dishes">Side Dishes</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Desserts">Desserts</option>
+            </select>
+            <button id="save-category-btn">Save Category</button>
+
+            <h4>Ingredients</h4>
+            <div id="recipe-details-ingredients-edit">
+                </div>
+            <button id="add-detail-ingredient-btn">Add Another Ingredient</button>
+            <button id="save-ingredients-btn">Save Ingredients</button>
+
+            <h4>Preparation Steps</h4>
+            <textarea id="recipe-details-steps" rows="6"></textarea>
+            <button id="save-prep-steps-btn">Save Preparation Steps</button>
+
+            <button id="close-details-btn">Close</button>
+            <p id="edit-message" style="display:none;"></p>
+        </div>
+
+        <hr>
+
+        <section id="meal-planner">
+            <h2>Weekly Meal Plan</h2>
+            <div class="meal-plan-grid">
+                <div class="day" data-day="monday">
+                    <h3>Monday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="tuesday">
+                    <h3>Tuesday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="wednesday">
+                    <h3>Wednesday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="thursday">
+                    <h3>Thursday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="friday">
+                    <h3>Friday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="saturday">
+                    <h3>Saturday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="sunday">
+                    <h3>Sunday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+            </div>
+            <button id="generate-list-btn">Generate Grocery List</button>
+            <button id="generate-cookbook-btn">Generate Printable Cookbook</button>
+        </section>
+
+        <hr>
+
+        <section id="grocery-list-section">
+            <h2>Grocery List</h2>
+            <div id="grocery-list-controls" style="display:none;">
+                <p>Check the items you need to get:</p>
+                <button id="finalize-list-btn">Finalize My Shopping List</button>
+            </div>
+            <ul id="grocery-list">
+                </ul>
+            <h3>Your Shopping List</h3>
+            <ul id="shopping-list">
+                </ul>
+        </section>
+    </main>
+    <script src="supabase.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
