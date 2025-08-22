@@ -1,8 +1,7 @@
 // --- Supabase Setup ---
-const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs';
+const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co'; // Replace with your Project URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs'; // Replace with your anon key
 const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 // Get DOM elements
 const recipeForm = document.getElementById('recipe-form');
 const addIngredientBtn = document.getElementById('add-ingredient-btn');
