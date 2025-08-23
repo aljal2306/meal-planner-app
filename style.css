@@ -240,6 +240,9 @@ select.meal-selector, #recipe-category, #recipe-details-category, #view-category
     main {
         grid-template-columns: 1fr;
     }
+    .ingredient-input-details {
+        flex-direction: column;
+    }
 }
 
 /* Print-specific styles to hide buttons and change layout */
