@@ -8,6 +8,7 @@ const addRecipeBtn = document.getElementById('add-recipe-btn');
 const recipeFormContainer = document.getElementById('recipe-form-container');
 const recipeForm = document.getElementById('recipe-form');
 const addIngredientBtn = document.getElementById('add-ingredient-btn');
+const closeRecipeFormBtn = document.getElementById('close-recipe-form-btn');
 const ingredientsList = document.getElementById('ingredients-list');
 const savedRecipesList = document.getElementById('saved-recipes-list');
 const mealSelectors = document.querySelectorAll('.meal-selector');
