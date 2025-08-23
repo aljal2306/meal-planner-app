@@ -53,34 +53,22 @@ select.meal-selector, #recipe-category, #recipe-details-category, #view-category
     border-radius: 4px;
 }
 
-#add-ingredient-btn, button[type="submit"], #generate-list-btn, #finalize-list-btn, #save-recipe-image-btn, #close-details-btn, #save-prep-steps-btn, #generate-cookbook-btn, #add-detail-ingredient-btn, #save-ingredients-btn, #save-category-btn, .delete-recipe-btn {
+#add-recipe-btn, #add-ingredient-btn, button[type="submit"], #generate-list-btn, #finalize-list-btn, #save-recipe-image-btn, #close-details-btn, #save-prep-steps-btn, #generate-cookbook-btn, #add-detail-ingredient-btn, #save-ingredients-btn, #save-category-btn, .delete-recipe-btn, .export-day-btn, #save-name-btn {
     background-color: #1a73e8;
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
+    padding: 8px 12px; /* Smaller padding */
+    border-radius: 8px; /* Rounded corners */
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px; /* Smaller font size */
     margin-top: 10px;
 }
 
-.export-day-btn, #save-name-btn {
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-top: 10px;
-}
-
-#delete-recipe-image-btn {
+#delete-recipe-image-btn, .delete-recipe-btn {
     background-color: #dc3545;
 }
 
 .delete-recipe-btn {
-    background-color: #dc3545;
     font-size: 12px;
     padding: 5px 8px;
     margin-left: auto;
@@ -169,7 +157,7 @@ select.meal-selector, #recipe-category, #recipe-details-category, #view-category
 }
 
 #recipe-details-name {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     border: none;
     background: transparent;
