@@ -64,7 +64,7 @@ select.meal-selector, #recipe-category, #recipe-details-category, #view-category
     margin-top: 10px;
 }
 
-.export-day-btn, #save-name-btn {
+.export-day-btn, #save-name-btn, #close-recipe-form-btn {
     background-color: #1a73e8;
     color: white;
     border: none;
