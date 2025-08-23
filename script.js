@@ -18,7 +18,7 @@ const groceryListElem = document.getElementById('grocery-list');
 const shoppingListElem = document.getElementById('shopping-list');
 const recipeDetails = document.getElementById('recipe-details');
 const recipeDetailsName = document.getElementById('recipe-details-name');
-const saveNameBtn = document.getElementById('save-name-btn');
+const saveNameBtn = document.getElementById('save-name-btn'); // New button
 const recipeDetailsIngredientsEdit = document.getElementById('recipe-details-ingredients-edit');
 const addDetailIngredientBtn = document.getElementById('add-detail-ingredient-btn');
 const saveIngredientsBtn = document.getElementById('save-ingredients-btn');
@@ -71,7 +71,6 @@ async function saveRecipeToDb(recipe) {
     await fetchRecipes();
     recipeForm.reset();
     recipeImageInput.value = '';
-    recipeFormContainer.style.display = 'none';
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
@@ -484,101 +483,6 @@ document.getElementById('meal-planner').addEventListener('click', (e) => {
 
             window.open(calendarUrl, '_blank');
         }
-    }
-});
-
-// --- Grocery List Functions ---
-
-generateListBtn.addEventListener('click', () => {
-    const consolidatedList = {};
-    for (const day in mealPlan) {
-        const recipeName = mealPlan[day];
-        if (recipeName) {
-            const recipe = recipes.find(r => r.name === recipeName);
-            if (recipe) {
-                recipe.ingredients.forEach(ingredient => {
-                    const key = ingredient.name.toLowerCase();
-                    if (!consolidatedList[key]) {
-                        consolidatedList[key] = {
-                            name: ingredient.name,
-                            quantity: 0,
-                            unit: ingredient.unit
-                        };
-                    }
-                    const currentQuantity = parseFloat(consolidatedList[key].quantity);
-                    const newQuantity = parseFloat(ingredient.quantity);
-                    if (!isNaN(currentQuantity) && !isNaN(newQuantity)) {
-                        consolidatedList[key].quantity = currentQuantity + newQuantity;
-                    } else if (ingredient.quantity) {
-                        consolidatedList[key].quantity = consolidatedList[key].quantity ? 
-                                `${consolidatedList[key].quantity}, ${ingredient.quantity}` : 
-                                ingredient.quantity;
-                    }
-                });
-            }
-        }
-    }
-    renderGroceryList(consolidatedList);
-});
-
-function renderGroceryList(list) {
-    groceryListElem.innerHTML = '';
-    shoppingListElem.innerHTML = '';
-    groceryListControls.style.display = 'block';
-    for (const key in list) {
-        const item = list[key];
-        const li = document.createElement('li');
-        const quantityText = item.quantity ? `${item.quantity} ${item.unit}`.trim() : '';
-        li.innerHTML = `<label><input type="checkbox" class="grocery-item-checkbox" data-item-name="${item.name}">${quantityText} ${item.name}</label>`;
-        groceryListElem.appendChild(li);
-    }
-}
-
-finalizeListBtn.addEventListener('click', () => {
-    const checkboxes = groceryListElem.querySelectorAll('.grocery-item-checkbox');
-    const shoppingList = [];
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            const listItem = checkbox.closest('li');
-            shoppingList.push(listItem.textContent.trim());
-        }
-    });
-    renderShoppingList(shoppingList);
-});
-
-function renderShoppingList(list) {
-    shoppingListElem.innerHTML = '';
-    if (list.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = "You have all the ingredients! Enjoy your cooking!";
-        shoppingListElem.appendChild(li);
-    } else {
-        list.forEach(itemText => {
-            const li = document.createElement('li');
-            li.textContent = itemText;
-            shoppingListElem.appendChild(li);
-        });
-    }
-}
-
-// --- Cookbook Generation Function ---
-generateCookbookBtn.addEventListener('click', () => {
-    const selectedCheckboxes = document.querySelectorAll('.cookbook-select-checkbox:checked');
-    const selectedRecipeNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.recipeName);
-    const cookbookRecipes = recipes.filter(r => selectedRecipeNames.includes(r.name));
-    if (cookbookRecipes.length > 0) {
-        let cookbookHTML = `<html><head><title>My Printable Cookbook</title><link rel="stylesheet" href="style.css"></head><body><header><h1>My Custom Cookbook</h1></header><main>`;
-        cookbookRecipes.forEach(recipe => {
-            const ingredientsList = recipe.ingredients.map(ing => `<li>${ing.quantity} ${ing.unit} ${ing.name}</li>`).join('');
-            cookbookHTML += `<div class="cookbook-recipe"><h3>${recipe.name}</h3>${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name} image">` : ''}<h4>Ingredients</h4><ul>${ingredientsList}</ul><h4>Preparation Steps</h4><p>${recipe.steps}</p></div>`;
-        });
-        cookbookHTML += `</main></body></html>`;
-        const newWindow = window.open('', '_blank');
-        newWindow.document.write(cookbookHTML);
-        newWindow.document.close();
-        newWindow.print();
-    } else {
-        alert("Please select at least one recipe to generate a cookbook.");
     }
 });
 
