@@ -14,41 +14,45 @@
 
     <main>
         <section id="recipe-manager">
-            <h2>Add New Recipe</h2>
-            <form id="recipe-form">
-                <label for="recipe-name">Recipe Name:</label>
-                <input type="text" id="recipe-name" required>
+            <h2>Recipe Management</h2>
+            <button id="add-recipe-btn">Add New Recipe</button>
+            
+            <div id="recipe-form-container" style="display:none;">
+                <form id="recipe-form">
+                    <label for="recipe-name">Recipe Name:</label>
+                    <input type="text" id="recipe-name" required>
 
-                <label for="recipe-category">Category:</label>
-                <select id="recipe-category" required>
-                    <option value="">Select a category...</option>
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Soups & Salads">Soups & Salads</option>
-                    <option value="Appetizers">Appetizers</option>
-                    <option value="Side Dishes">Side Dishes</option>
-                    <option value="Dinner">Dinner</option>
-                    <option value="Desserts">Desserts</option>
-                </select>
+                    <label for="recipe-category">Category:</label>
+                    <select id="recipe-category" required>
+                        <option value="">Select a category...</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Soups & Salads">Soups & Salads</option>
+                        <option value="Appetizers">Appetizers</option>
+                        <option value="Side Dishes">Side Dishes</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Desserts">Desserts</option>
+                    </select>
 
-                <div id="ingredients-list">
-                    <label>Ingredients:</label>
-                    <div class="ingredient-input">
-                        <input type="text" class="ingredient-name" placeholder="Name (e.g., Chicken)">
-                        <input type="text" class="ingredient-quantity" placeholder="Quantity (e.g., 2)">
-                        <input type="text" class="ingredient-unit" placeholder="Unit (e.g., lbs)">
+                    <div id="ingredients-list">
+                        <label>Ingredients:</label>
+                        <div class="ingredient-input">
+                            <input type="text" class="ingredient-name" placeholder="Name (e.g., Chicken)">
+                            <input type="text" class="ingredient-quantity" placeholder="Quantity (e.g., 2)">
+                            <input type="text" class="ingredient-unit" placeholder="Unit (e.g., lbs)">
+                        </div>
                     </div>
-                </div>
-                <button type="button" id="add-ingredient-btn">Add Another Ingredient</button>
+                    <button type="button" id="add-ingredient-btn">Add Another Ingredient</button>
 
-                <label for="prep-steps">Preparation Steps:</label>
-                <textarea id="prep-steps" rows="4"></textarea>
+                    <label for="prep-steps">Preparation Steps:</label>
+                    <textarea id="prep-steps" rows="4"></textarea>
 
-                <label for="recipe-image">Add a picture:</label>
-                <input type="file" id="recipe-image" accept="image/*">
+                    <label for="recipe-image">Add a picture:</label>
+                    <input type="file" id="recipe-image" accept="image/*">
 
-                <button type="submit">Save Recipe</button>
-            </form>
+                    <button type="submit">Save Recipe</button>
+                </form>
+            </div>
 
             <h3 style="margin-top: 40px;">View Saved Recipes</h3>
             <label for="view-category-select">Select Category to View:</label>
