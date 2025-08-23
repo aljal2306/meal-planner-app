@@ -1,9 +1,11 @@
 // --- Supabase Setup ---
 const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Get DOM elements
+const addRecipeBtn = document.getElementById('add-recipe-btn');
+const recipeFormContainer = document.getElementById('recipe-form-container');
 const recipeForm = document.getElementById('recipe-form');
 const addIngredientBtn = document.getElementById('add-ingredient-btn');
 const ingredientsList = document.getElementById('ingredients-list');
@@ -16,7 +18,7 @@ const groceryListElem = document.getElementById('grocery-list');
 const shoppingListElem = document.getElementById('shopping-list');
 const recipeDetails = document.getElementById('recipe-details');
 const recipeDetailsName = document.getElementById('recipe-details-name');
-const saveNameBtn = document.getElementById('save-name-btn'); // New button
+const saveNameBtn = document.getElementById('save-name-btn');
 const recipeDetailsIngredientsEdit = document.getElementById('recipe-details-ingredients-edit');
 const addDetailIngredientBtn = document.getElementById('add-detail-ingredient-btn');
 const saveIngredientsBtn = document.getElementById('save-ingredients-btn');
@@ -46,7 +48,7 @@ let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {};
 // --- Data Fetching and Saving Functions ---
 
 async function fetchRecipes() {
-    let { data, error } = await supabaseClient
+    let { data, error } = await supabase
         .from('recipes')
         .select('*');
     if (error) {
@@ -58,7 +60,7 @@ async function fetchRecipes() {
 }
 
 async function saveRecipeToDb(recipe) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .insert([recipe]);
     if (error) {
@@ -69,10 +71,11 @@ async function saveRecipeToDb(recipe) {
     await fetchRecipes();
     recipeForm.reset();
     recipeImageInput.value = '';
+    recipeFormContainer.style.display = 'none';
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .update(updateObject)
         .eq('name', oldName);
@@ -85,7 +88,7 @@ async function updateRecipeInDb(oldName, updateObject) {
 }
 
 async function deleteRecipeFromDb(recipeName) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .delete()
         .eq('name', recipeName);
@@ -167,13 +170,19 @@ recipeForm.addEventListener('submit', (e) => {
 });
 
 function renderRecipes() {
+    const selectedCategory = viewCategorySelect.value;
+    const recipesToDisplay = selectedCategory === 'All' ? recipes : recipes.filter(r => r.category === selectedCategory);
+    
+    if (recipesToDisplay.length > 0) {
+        savedRecipesList.style.display = 'block';
+    } else {
+        savedRecipesList.style.display = 'none';
+    }
+
     savedRecipesList.innerHTML = '';
     mealSelectors.forEach(selector => {
         selector.innerHTML = '<option value="">Select a recipe...</option>';
     });
-
-    const selectedCategory = viewCategorySelect.value;
-    const recipesToDisplay = selectedCategory === 'All' ? recipes : recipes.filter(r => r.category === selectedCategory);
 
     recipesToDisplay.forEach(recipe => {
         const li = document.createElement('li');
@@ -213,6 +222,11 @@ function renderRecipes() {
         }
     });
 }
+
+addRecipeBtn.addEventListener('click', () => {
+    recipeFormContainer.style.display = 'block';
+    addRecipeBtn.style.display = 'none';
+});
 
 viewCategorySelect.addEventListener('change', renderRecipes);
 
@@ -263,7 +277,7 @@ saveNameBtn.addEventListener('click', async () => {
             return;
         }
 
-        const { error } = await supabaseClient
+        const { error } = await supabase
             .from('recipes')
             .update({ name: newRecipeName })
             .eq('name', currentRecipeName);
@@ -356,6 +370,7 @@ closeDetailsBtn.addEventListener('click', () => {
     document.getElementById('recipe-manager').style.display = 'block';
     document.getElementById('meal-planner').style.display = 'block';
     document.getElementById('grocery-list-section').style.display = 'block';
+    addRecipeBtn.style.display = 'block';
 });
 
 saveRecipeImageBtn.addEventListener('click', async () => {
