@@ -1,7 +1,7 @@
 // --- Supabase Setup ---
 const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs'; // Replace with your anon key
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Get DOM elements
 const addRecipeBtn = document.getElementById('add-recipe-btn');
@@ -49,7 +49,7 @@ let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {};
 // --- Data Fetching and Saving Functions ---
 
 async function fetchRecipes() {
-    let { data, error } = await supabaseClient
+    let { data, error } = await supabase
         .from('recipes')
         .select('*');
     if (error) {
@@ -61,7 +61,7 @@ async function fetchRecipes() {
 }
 
 async function saveRecipeToDb(recipe) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .insert([recipe]);
     if (error) {
@@ -75,7 +75,7 @@ async function saveRecipeToDb(recipe) {
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .update(updateObject)
         .eq('name', oldName);
@@ -88,7 +88,7 @@ async function updateRecipeInDb(oldName, updateObject) {
 }
 
 async function deleteRecipeFromDb(recipeName) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .delete()
         .eq('name', recipeName);
@@ -171,49 +171,50 @@ recipeForm.addEventListener('submit', (e) => {
 
 function renderRecipes() {
     const selectedCategory = viewCategorySelect.value;
-    const recipesToDisplay = selectedCategory === 'All' ? recipes : recipes.filter(r => r.category === selectedCategory);
     
-    if (recipesToDisplay.length > 0) {
-        savedRecipesList.style.display = 'block';
+    if (selectedCategory !== '') {
+        const recipesToDisplay = selectedCategory === 'All' ? recipes : recipes.filter(r => r.category === selectedCategory);
+        savedRecipesList.innerHTML = '';
+        
+        if (recipesToDisplay.length > 0) {
+            savedRecipesList.style.display = 'block';
+        } else {
+            savedRecipesList.style.display = 'none';
+        }
+
+        recipesToDisplay.forEach(recipe => {
+            const li = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'cookbook-select-checkbox';
+            checkbox.dataset.recipeName = recipe.name;
+
+            const label = document.createElement('span');
+            label.textContent = recipe.name;
+            label.className = 'recipe-item-label';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.classList.add('delete-recipe-btn');
+            deleteBtn.dataset.recipeName = recipe.name;
+
+            li.appendChild(checkbox);
+            li.appendChild(label);
+            li.appendChild(deleteBtn);
+            li.classList.add('recipe-item');
+            savedRecipesList.appendChild(li);
+
+            const option = document.createElement('option');
+            option.value = recipe.name;
+            option.textContent = recipe.name;
+            mealSelectors.forEach(selector => {
+                const newOption = option.cloneNode(true);
+                selector.appendChild(newOption);
+            });
+        });
     } else {
         savedRecipesList.style.display = 'none';
     }
-
-    savedRecipesList.innerHTML = '';
-    mealSelectors.forEach(selector => {
-        selector.innerHTML = '<option value="">Select a recipe...</option>';
-    });
-
-    recipesToDisplay.forEach(recipe => {
-        const li = document.createElement('li');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'cookbook-select-checkbox';
-        checkbox.dataset.recipeName = recipe.name;
-
-        const label = document.createElement('span');
-        label.textContent = recipe.name;
-        label.className = 'recipe-item-label';
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.classList.add('delete-recipe-btn');
-        deleteBtn.dataset.recipeName = recipe.name;
-
-        li.appendChild(checkbox);
-        li.appendChild(label);
-        li.appendChild(deleteBtn);
-        li.classList.add('recipe-item');
-        savedRecipesList.appendChild(li);
-
-        const option = document.createElement('option');
-        option.value = recipe.name;
-        option.textContent = recipe.name;
-        mealSelectors.forEach(selector => {
-            const newOption = option.cloneNode(true);
-            selector.appendChild(newOption);
-        });
-    });
 
     mealSelectors.forEach(selector => {
         const day = selector.closest('.day').dataset.day;
@@ -228,12 +229,12 @@ addRecipeBtn.addEventListener('click', () => {
     addRecipeBtn.style.display = 'none';
 });
 
-viewCategorySelect.addEventListener('change', renderRecipes);
-
 closeRecipeFormBtn.addEventListener('click', () => {
     recipeFormContainer.style.display = 'none';
     addRecipeBtn.style.display = 'block';
 });
+
+viewCategorySelect.addEventListener('change', renderRecipes);
 
 savedRecipesList.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-recipe-btn')) {
