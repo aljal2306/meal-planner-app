@@ -8,7 +8,6 @@ const addRecipeBtn = document.getElementById('add-recipe-btn');
 const recipeFormContainer = document.getElementById('recipe-form-container');
 const recipeForm = document.getElementById('recipe-form');
 const addIngredientBtn = document.getElementById('add-ingredient-btn');
-const closeRecipeFormBtn = document.getElementById('close-recipe-form-btn');
 const ingredientsList = document.getElementById('ingredients-list');
 const savedRecipesList = document.getElementById('saved-recipes-list');
 const mealSelectors = document.querySelectorAll('.meal-selector');
@@ -19,7 +18,7 @@ const groceryListElem = document.getElementById('grocery-list');
 const shoppingListElem = document.getElementById('shopping-list');
 const recipeDetails = document.getElementById('recipe-details');
 const recipeDetailsName = document.getElementById('recipe-details-name');
-const saveNameBtn = document.getElementById('save-name-btn');
+const saveNameBtn = document.getElementById('save-name-btn'); // New button
 const recipeDetailsIngredientsEdit = document.getElementById('recipe-details-ingredients-edit');
 const addDetailIngredientBtn = document.getElementById('add-detail-ingredient-btn');
 const saveIngredientsBtn = document.getElementById('save-ingredients-btn');
@@ -72,8 +71,6 @@ async function saveRecipeToDb(recipe) {
     await fetchRecipes();
     recipeForm.reset();
     recipeImageInput.value = '';
-    recipeFormContainer.style.display = 'none';
-    addRecipeBtn.style.display = 'block';
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
