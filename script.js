@@ -37,7 +37,6 @@ const recipeDetailsCategorySelect = document.getElementById('recipe-details-cate
 const saveCategoryBtn = document.getElementById('save-category-btn');
 const viewCategorySelect = document.getElementById('view-category-select');
 const deleteRecipeImageBtn = document.getElementById('delete-recipe-image-btn');
-const exportDayBtns = document.querySelectorAll('.export-day-btn');
 
 let currentRecipeName = null;
 
@@ -149,7 +148,7 @@ function renderRecipes() {
             const option = document.createElement('option');
             option.value = recipe.name;
             option.textContent = recipe.name;
-            selector.appendChild(newOption);
+            selector.appendChild(option);
         });
         const day = selector.closest('.day').dataset.day;
         if (mealPlan[day]) {
