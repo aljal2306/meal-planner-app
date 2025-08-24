@@ -1,7 +1,7 @@
 // --- Supabase Setup ---
 const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Get DOM elements
 const addRecipeBtn = document.getElementById('add-recipe-btn');
@@ -19,7 +19,7 @@ const groceryListElem = document.getElementById('grocery-list');
 const shoppingListElem = document.getElementById('shopping-list');
 const recipeDetails = document.getElementById('recipe-details');
 const recipeDetailsName = document.getElementById('recipe-details-name');
-const saveNameBtn = document.getElementById('save-name-btn');
+const saveNameBtn = document.getElementById('save-name-btn'); // New button
 const recipeDetailsIngredientsEdit = document.getElementById('recipe-details-ingredients-edit');
 const addDetailIngredientBtn = document.getElementById('add-detail-ingredient-btn');
 const saveIngredientsBtn = document.getElementById('save-ingredients-btn');
@@ -39,13 +39,17 @@ const viewCategorySelect = document.getElementById('view-category-select');
 const deleteRecipeImageBtn = document.getElementById('delete-recipe-image-btn');
 const exportDayBtns = document.querySelectorAll('.export-day-btn');
 
+// Variable to store the name of the currently viewed recipe
 let currentRecipeName = null;
 
+// Initialize data from Supabase and localStorage
 let recipes = [];
 let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {};
 
+// --- Data Fetching and Saving Functions ---
+
 async function fetchRecipes() {
-    let { data, error } = await supabase
+    let { data, error } = await supabaseClient
         .from('recipes')
         .select('*');
     if (error) {
@@ -57,7 +61,7 @@ async function fetchRecipes() {
 }
 
 async function saveRecipeToDb(recipe) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('recipes')
         .insert([recipe]);
     if (error) {
@@ -73,7 +77,7 @@ async function saveRecipeToDb(recipe) {
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('recipes')
         .update(updateObject)
         .eq('name', oldName);
@@ -86,7 +90,7 @@ async function updateRecipeInDb(oldName, updateObject) {
 }
 
 async function deleteRecipeFromDb(recipeName) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('recipes')
         .delete()
         .eq('name', recipeName);
@@ -103,6 +107,69 @@ async function deleteRecipeFromDb(recipeName) {
     localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
     await fetchRecipes();
 }
+
+// --- Recipe Management Functions ---
+
+addIngredientBtn.addEventListener('click', () => {
+    const ingredientInputDiv = document.createElement('div');
+    ingredientInputDiv.className = 'ingredient-input';
+    ingredientInputDiv.innerHTML = `
+        <input type="text" class="ingredient-name" placeholder="Name">
+        <input type="text" class="ingredient-quantity" placeholder="Quantity">
+        <input type="text" class="ingredient-unit" placeholder="Unit">
+    `;
+    ingredientsList.appendChild(ingredientInputDiv);
+});
+
+recipeForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const recipeName = document.getElementById('recipe-name').value;
+    const recipeCategory = recipeCategorySelect.value;
+    const prepSteps = document.getElementById('prep-steps').value;
+
+    const ingredientInputs = ingredientsList.querySelectorAll('.ingredient-input');
+    const ingredients = [];
+    ingredientInputs.forEach(inputDiv => {
+        const name = inputDiv.querySelector('.ingredient-name').value;
+        const quantity = inputDiv.querySelector('.ingredient-quantity').value;
+        const unit = inputDiv.querySelector('.ingredient-unit').value;
+        if (name) {
+            ingredients.push({ name, quantity, unit });
+        }
+    });
+
+    const file = recipeImageInput.files[0];
+    const newRecipe = {
+        name: recipeName,
+        category: recipeCategory,
+        ingredients: ingredients,
+        steps: prepSteps,
+        image: null
+    };
+
+    const saveRecipe = () => {
+        saveRecipeToDb(newRecipe);
+    };
+
+    if (file) {
+        const fileSizeLimit = 4 * 1024 * 1024;
+        if (file.size > fileSizeLimit) {
+            alert("Error: The image file is too large. Please select a smaller image (under 4MB).");
+            recipeImageInput.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            newRecipe.image = reader.result;
+            saveRecipe();
+        };
+        reader.readAsDataURL(file);
+    } else {
+        saveRecipe();
+    }
+});
 
 function renderRecipes() {
     const selectedCategory = viewCategorySelect.value;
