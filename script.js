@@ -67,8 +67,6 @@ async function saveRecipeToDb(recipe) {
     await fetchRecipes();
     recipeForm.reset();
     recipeImageInput.value = '';
-    recipeFormContainer.style.display = 'none';
-    addRecipeBtn.style.display = 'block';
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
@@ -375,7 +373,7 @@ mealSelectors.forEach(selector => {
         mealPlan[day] = e.target.value;
         localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
         
-        const exportBtn = e.target.closest('.day').querySelector('.export-day-btn');
+        const exportBtn = selector.closest('.day').querySelector('.export-day-btn');
         if (e.target.value) {
             exportBtn.style.display = 'block';
         } else {
