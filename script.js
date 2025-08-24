@@ -1,7 +1,7 @@
 // --- Supabase Setup ---
 const SUPABASE_URL = 'https://subswvcwemwwfolsepuj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YnN3dmN3ZW13d2ZvbHNlcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY0OTYsImV4cCI6MjA3MTIzMjQ5Nn0.MtpRVPgKs443rVzWuBXaFPChG4pIiey9FT0NAiHlbxs';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Get DOM elements
 const addRecipeBtn = document.getElementById('add-recipe-btn');
@@ -49,7 +49,7 @@ let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {};
 // --- Data Fetching and Saving Functions ---
 
 async function fetchRecipes() {
-    let { data, error } = await supabaseClient
+    let { data, error } = await supabase
         .from('recipes')
         .select('*');
     if (error) {
@@ -61,7 +61,7 @@ async function fetchRecipes() {
 }
 
 async function saveRecipeToDb(recipe) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .insert([recipe]);
     if (error) {
@@ -75,7 +75,7 @@ async function saveRecipeToDb(recipe) {
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .update(updateObject)
         .eq('name', oldName);
@@ -88,7 +88,7 @@ async function updateRecipeInDb(oldName, updateObject) {
 }
 
 async function deleteRecipeFromDb(recipeName) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .delete()
         .eq('name', recipeName);
