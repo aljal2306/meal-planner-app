@@ -134,4 +134,57 @@
                     <select class="meal-selector">
                         <option value="">Select a recipe...</option>
                     </select>
-                    <button
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="thursday">
+                    <h3>Thursday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="friday">
+                    <h3>Friday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="saturday">
+                    <h3>Saturday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+                <div class="day" data-day="sunday">
+                    <h3>Sunday</h3>
+                    <select class="meal-selector">
+                        <option value="">Select a recipe...</option>
+                    </select>
+                    <button class="export-day-btn" style="display:none;">Export to Calendar</button>
+                </div>
+            </div>
+            <button id="generate-list-btn">Generate Grocery List</button>
+            <button id="generate-cookbook-btn">Generate Printable Cookbook</button>
+        </section>
+
+        <hr>
+
+        <section id="grocery-list-section">
+            <h2>Grocery List</h2>
+            <div id="grocery-list-controls" style="display:none;">
+                <p>Check the items you need to get:</p>
+                <button id="finalize-list-btn">Finalize My Shopping List</button>
+            </div>
+            <ul id="grocery-list" style="display:none;">
+                </ul>
+            <h3>Your Shopping List</h3>
+            <ul id="shopping-list" style="display:none;">
+                </ul>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>
