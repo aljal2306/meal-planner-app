@@ -44,7 +44,7 @@ let recipes = [];
 let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {};
 
 async function fetchRecipes() {
-    let { data, error } = await supabaseClient
+    let { data, error } = await supabase
         .from('recipes')
         .select('*');
     if (error) {
@@ -56,7 +56,7 @@ async function fetchRecipes() {
 }
 
 async function saveRecipeToDb(recipe) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .insert([recipe]);
     if (error) {
@@ -70,7 +70,7 @@ async function saveRecipeToDb(recipe) {
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .update(updateObject)
         .eq('name', oldName);
@@ -83,7 +83,7 @@ async function updateRecipeInDb(oldName, updateObject) {
 }
 
 async function deleteRecipeFromDb(recipeName) {
-    const { error } = await supabaseClient
+    const { error } = await supabase
         .from('recipes')
         .delete()
         .eq('name', recipeName);
