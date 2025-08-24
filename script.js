@@ -37,7 +37,6 @@ const recipeDetailsCategorySelect = document.getElementById('recipe-details-cate
 const saveCategoryBtn = document.getElementById('save-category-btn');
 const viewCategorySelect = document.getElementById('view-category-select');
 const deleteRecipeImageBtn = document.getElementById('delete-recipe-image-btn');
-const exportDayBtns = document.querySelectorAll('.export-day-btn');
 
 let currentRecipeName = null;
 
@@ -68,6 +67,8 @@ async function saveRecipeToDb(recipe) {
     await fetchRecipes();
     recipeForm.reset();
     recipeImageInput.value = '';
+    recipeFormContainer.style.display = 'none';
+    addRecipeBtn.style.display = 'block';
 }
 
 async function updateRecipeInDb(oldName, updateObject) {
